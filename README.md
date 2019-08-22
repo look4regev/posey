@@ -1,4 +1,4 @@
-# posey
+# Posey
 AI Game that shows poses and sees if you can match them using Tensorflow.js and Google's [PoseNet](https://experiments.withgoogle.com/experiments?tag=PoseNet)
 
 ## Resources
