@@ -1,12 +1,12 @@
-import React from "react";
-import Posey from "./components/Posey.js";
+import React from 'react'
+import Posey from "./components/Posey";
 
 const App = () => {
   return (
     <div>
-      <Posey />
+      <Posey/>
     </div>
-  );
+  )
 };
 
-export default App;
+export default App
