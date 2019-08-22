@@ -8,4 +8,4 @@ yarn-error.log
 .travis.yml
 package-lock.json
 secrets.js
-./idea
+.idea
