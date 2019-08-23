@@ -9,3 +9,4 @@ yarn-error.log
 package-lock.json
 secrets.js
 .idea
+.DS_Store
