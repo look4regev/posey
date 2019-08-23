@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 
 import "./game.css";
-import Camera from "./Camera";
 import PropTypes from "prop-types";
 
 class Game extends Component {
@@ -9,7 +8,6 @@ class Game extends Component {
     super(props);
     this.state = {
       timeLeft: 3,
-      cameraOn: false,
       image: ""
     };
   }
@@ -20,10 +18,11 @@ class Game extends Component {
   }
 
   componentDidMount() {
-    this.setState({ image: Game.getRandomImage() });
+    const image = Game.getRandomImage();
+    this.setState({ image: image });
     this.interval = setInterval(() => {
       if (this.state.timeLeft === 1) {
-        this.setState({ cameraOn: true });
+        this.props.sendData(image);
       } else {
         this.setState({ timeLeft: this.state.timeLeft - 1 });
       }
@@ -33,27 +32,23 @@ class Game extends Component {
   componentWillUnmount() {
     clearInterval(this.interval);
     this.setState({
-      timeLeft: 3
+      timeLeft: 3,
+      image: ""
     });
   }
 
   render() {
     return (
       <div>
-        {!this.state.cameraOn && <h2>{this.state.timeLeft}</h2>}
-        {!this.state.cameraOn && (
-          <img id="pose" src={"/poses/" + this.state.image} alt="yoga pose" />
-        )}
-        {this.state.cameraOn && (
-          <Camera image={this.state.image} posenet={this.props.posenet} />
-        )}
+        {<h2>{this.state.timeLeft}</h2>}
+        {<img id="pose" src={"/poses/" + this.state.image} alt="yoga pose" />}
       </div>
     );
   }
 }
 
 Game.propTypes = {
-  posenet: PropTypes.any
+  sendData: PropTypes.func
 };
 
 export default Game;

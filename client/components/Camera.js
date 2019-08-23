@@ -1,11 +1,14 @@
 import { drawKeyPoints, drawSkeleton } from "./utils";
 import React, { Component } from "react";
 import PropTypes from "prop-types";
-import poses from "../../poses.json";
+import posesJson from "../../poses.json";
+
+import "./game.css";
 
 const similarity = require("compute-cosine-similarity");
 
 const threshold = 50;
+let keypointsVector;
 
 class PoseNet extends Component {
   static defaultProps = {
@@ -30,11 +33,7 @@ class PoseNet extends Component {
     super(props, PoseNet.defaultProps);
     this.state = {
       timeLeft: 11,
-      showTimer: false,
-      pose: poses[this.props.image],
-      keypointsVector: PoseNet.keyPointsToVector(
-        poses[this.props.image].keypoints
-      )
+      showTimer: false
     };
   }
 
@@ -69,21 +68,25 @@ class PoseNet extends Component {
         "This browser does not support video capture, or this device does not have a camera"
       );
     }
-    this.detectPose();
+    keypointsVector = PoseNet.keyPointsToVector(
+      posesJson[this.props.image].keypoints
+    );
+    console.log(this.props.image);
     this.interval = setInterval(() => {
       this.setState({ showTimer: true });
       if (this.state.timeLeft === 1) {
-        //TODO - continue to next image
+        this.props.sendData(false);
       } else {
         this.setState({ timeLeft: this.state.timeLeft - 1 });
       }
     }, 1000);
+    this.detectPose();
   }
 
   componentWillUnmount() {
     clearInterval(this.interval);
     this.setState({
-      timeLeft: 10
+      timeLeft: 11
     });
   }
 
@@ -178,13 +181,14 @@ class PoseNet extends Component {
       }
       poses.forEach(({ score, keypoints }) => {
         if (score >= minPoseConfidence) {
-          const keyPointsVector = PoseNet.keyPointsToVector(keypoints);
+          const cameraKeyPointsVector = PoseNet.keyPointsToVector(keypoints);
           const distance = PoseNet.cosineDistanceMatching(
-            keyPointsVector,
-            this.state.keypointsVector
+            cameraKeyPointsVector,
+            keypointsVector
           );
           if (distance > threshold) {
-            console.log("Nice!!");
+            console.log("Success!!!");
+            this.props.sendData(true);
           }
           if (showPoints) {
             drawKeyPoints(
@@ -224,6 +228,7 @@ class PoseNet extends Component {
 }
 
 PoseNet.propTypes = {
+  sendData: PropTypes.func,
   image: PropTypes.string,
   posenet: PropTypes.any,
   algorithm: PropTypes.string,
