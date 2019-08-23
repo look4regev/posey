@@ -14,8 +14,8 @@ class Game extends Component {
   }
 
   static getRandomImage() {
-    const index = Math.floor(Math.random() * 53) + 1;
-    return "File " + index + ".png";
+    const index = Math.floor(Math.random() * 20) + 1;
+    return index + ".jpg";
   }
 
   componentDidMount() {
