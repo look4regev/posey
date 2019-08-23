@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import "./posey.css";
 import Game from "./Game";
+import * as posenet from "@tensorflow-models/posenet";
 
 class Posey extends Component {
   constructor(props) {
@@ -16,6 +17,28 @@ class Posey extends Component {
     this.setState({ gameStarted: true });
   }
 
+  async componentDidMount() {
+    try {
+      // this.posenet = await posenet.load();
+      this.posenet = await posenet.load({
+        // architecture: 'ResNet50',
+        // outputStride: 16,
+        // inputResolution: 801,
+        // quantBytes: 4
+        architecture: "MobileNetV1",
+        outputStride: 16,
+        inputResolution: 161,
+        multiplier: 0.5
+      });
+    } catch (error) {
+      throw new Error("PoseNet failed to load");
+    } finally {
+      setTimeout(() => {
+        this.setState({ loading: false });
+      }, 200);
+    }
+  }
+
   render() {
     return (
       <div>
@@ -23,7 +46,7 @@ class Posey extends Component {
         {!this.state.gameStarted && (
           <button onClick={this.startGame}>Start</button>
         )}
-        {this.state.gameStarted && <Game />}
+        {this.state.gameStarted && <Game posenet={this.posenet} />}
       </div>
     );
   }

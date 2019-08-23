@@ -1,17 +1,21 @@
 import { drawKeyPoints, drawSkeleton } from "./utils";
 import React, { Component } from "react";
-import * as posenet from "@tensorflow-models/posenet";
 import PropTypes from "prop-types";
+import poses from "../../poses.json";
+
+const similarity = require("compute-cosine-similarity");
+
+const threshold = 50;
 
 class PoseNet extends Component {
   static defaultProps = {
-    videoWidth: 900,
-    videoHeight: 700,
+    videoWidth: 620,
+    videoHeight: 349,
     flipHorizontal: true,
     algorithm: "single-pose",
     showVideo: true,
-    showSkeleton: true,
-    showPoints: true,
+    showSkeleton: false,
+    showPoints: false,
     minPoseConfidence: 0.1,
     minPartConfidence: 0.5,
     maxPoseDetections: 2,
@@ -19,12 +23,34 @@ class PoseNet extends Component {
     outputStride: 16,
     imageScaleFactor: 0.5,
     skeletonColor: "#ffadea",
-    skeletonLineWidth: 6,
-    loadingText: "Loading...please be patient..."
+    skeletonLineWidth: 6
   };
 
   constructor(props) {
     super(props, PoseNet.defaultProps);
+    this.state = {
+      timeLeft: 11,
+      showTimer: false,
+      pose: poses[this.props.image],
+      keypointsVector: PoseNet.keyPointsToVector(
+        poses[this.props.image].keypoints
+      )
+    };
+  }
+
+  static keyPointsToVector(keypoints) {
+    let vector = [];
+    for (const [, value] of Object.entries(keypoints)) {
+      vector.push(value.position.x);
+      vector.push(value.position.y);
+    }
+    return vector;
+  }
+
+  static cosineDistanceMatching(poseVector1, poseVector2) {
+    let cosineSimilarity = similarity(poseVector1, poseVector2);
+    let distance = 2 * (1 - cosineSimilarity);
+    return Math.sqrt(distance);
   }
 
   getCanvas = elem => {
@@ -43,27 +69,22 @@ class PoseNet extends Component {
         "This browser does not support video capture, or this device does not have a camera"
       );
     }
-
-    try {
-      // this.posenet = await posenet.load();
-      this.posenet = await posenet.load({
-        // architecture: 'ResNet50',
-        // outputStride: 16,
-        // inputResolution: 801,
-        // quantBytes: 4
-        architecture: "MobileNetV1",
-        outputStride: 16,
-        inputResolution: 161,
-        multiplier: 0.5
-      });
-    } catch (error) {
-      throw new Error("PoseNet failed to load");
-    } finally {
-      setTimeout(() => {
-        this.setState({ loading: false });
-      }, 200);
-    }
     this.detectPose();
+    this.interval = setInterval(() => {
+      this.setState({ showTimer: true });
+      if (this.state.timeLeft === 1) {
+        //TODO - continue to next image
+      } else {
+        this.setState({ timeLeft: this.state.timeLeft - 1 });
+      }
+    }, 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+    this.setState({
+      timeLeft: 10
+    });
   }
 
   async setupCamera() {
@@ -119,7 +140,7 @@ class PoseNet extends Component {
       skeletonColor,
       skeletonLineWidth
     } = this.props;
-    const posenetModel = this.posenet;
+    const posenetModel = this.props.posenet;
     const video = this.video;
     const findPoseDetectionFrame = async () => {
       let poses = [];
@@ -157,6 +178,14 @@ class PoseNet extends Component {
       }
       poses.forEach(({ score, keypoints }) => {
         if (score >= minPoseConfidence) {
+          const keyPointsVector = PoseNet.keyPointsToVector(keypoints);
+          const distance = PoseNet.cosineDistanceMatching(
+            keyPointsVector,
+            this.state.keypointsVector
+          );
+          if (distance > threshold) {
+            console.log("Nice!!");
+          }
           if (showPoints) {
             drawKeyPoints(
               keypoints,
@@ -185,6 +214,7 @@ class PoseNet extends Component {
     return (
       <div>
         <div>
+          {this.state.showTimer && <h2>{this.state.timeLeft}</h2>}
           <video id="videoNoShow" playsInline ref={this.getVideo} />
           <canvas className="webcam" ref={this.getCanvas} />
         </div>
@@ -194,6 +224,8 @@ class PoseNet extends Component {
 }
 
 PoseNet.propTypes = {
+  image: PropTypes.string,
+  posenet: PropTypes.any,
   algorithm: PropTypes.string,
   imageScaleFactor: PropTypes.number,
   flipHorizontal: PropTypes.bool,

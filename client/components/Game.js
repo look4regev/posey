@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import "./game.css";
 import Camera from "./Camera";
+import PropTypes from "prop-types";
 
 class Game extends Component {
   constructor(props) {
@@ -41,12 +42,18 @@ class Game extends Component {
       <div>
         {!this.state.cameraOn && <h2>{this.state.timeLeft}</h2>}
         {!this.state.cameraOn && (
-          <img src={"/poses/" + this.state.image} alt="yoga pose" />
+          <img id="pose" src={"/poses/" + this.state.image} alt="yoga pose" />
         )}
-        {this.state.cameraOn && <Camera />}
+        {this.state.cameraOn && (
+          <Camera image={this.state.image} posenet={this.props.posenet} />
+        )}
       </div>
     );
   }
 }
+
+Game.propTypes = {
+  posenet: PropTypes.any
+};
 
 export default Game;
