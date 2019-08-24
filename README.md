@@ -11,5 +11,7 @@ AI Game that shows poses and sees if you can match them using Tensorflow.js and 
 
 ## How to run
 
-1.  npm install
-2.  npm run start-dev
+```
+npm install
+npm run start-dev
+```
