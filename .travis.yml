@@ -3,7 +3,7 @@ node_js:
   - 10
 deploy:
   provider: heroku
-  api: posey-game
+  app: posey-game
   api_key:
     secure: Isnk2qccg6E/6h50cguhZ+cqg4By+ziJ40NZdofh/laHSwDl3LL5C2LQvwUvDN2NCNNnERju00kveVdDq2F4/ea+aF6XmcraBQ75qs3JMZBs7rCCn1oqB6QGwxjpA9fy5he0h1JSDpp8RGGMB3SmPAHVtxLNySypHiS2DrbxerGOuonwd98Wf6gTHDspxJEd5iENwaGL4OPGBNLvwxx92RIDwc3W/cIEeEONOYoQNQWfSORUIiTqwpLxqf5vT7rag9JxRljZ2Jz4W+aQ88F6ccfjqH/B4QLNUQgMjnobg5YnQirMO5rKikrEWjXzjwJ8KcVCvCqE1QT3q0I7g8lbj9Fl+ZAaz4of0UDkWgU9Ytu19HxLf39Dg7AaIyxedB1s4HuG2lh/pc/LgWRZFNheMK6mN4MISlWXvlYyHHm22Ls6lk9DEw+cu/CPBm/1B2vOX7TO+/SF3bWpotpBLweQRPETlhrQ60YeMbwEvrOwFfYWq7VtFDTT0Ktt/HBxHtF5l4F/MOg2whZ9JVQIjx4JzJhky+Pw7lzDidsSaLb1rSZPq2Q26fodz8ZHCPp23Pbm/nmvrJKBDLw10fMuLzig1zxbLnhsSck/0Q9Gsczdxk/+0VcU9Q9RF0z/cmGbgZm6STM2pu8WKk0hd/1HvO0JRSR17EzkG5vAniqEsRtuhbs=
   run:
