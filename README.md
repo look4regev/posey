@@ -1,6 +1,7 @@
 # Posey
 
 [![Build Status](https://secure.travis-ci.org/look4regev/posey.svg)](http://travis-ci.org/look4regev/posey.svg)
+[![Heroku](https://img.shields.io/badge/heroku-deployed-blueviolet)](https://posey-game.herokuapp.com)
 
 AI Game that shows poses and sees if you can match them using Tensorflow.js and Google's [PoseNet](https://experiments.withgoogle.com/experiments?tag=PoseNet)
 
