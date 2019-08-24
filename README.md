@@ -1,5 +1,7 @@
 # Posey
 
+[![Build Status](https://secure.travis-ci.org/look4regev/posey.svg)](http://travis-ci.org/look4regev/posey.svg)
+
 AI Game that shows poses and sees if you can match them using Tensorflow.js and Google's [PoseNet](https://experiments.withgoogle.com/experiments?tag=PoseNet)
 
 ## Resources

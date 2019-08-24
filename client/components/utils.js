@@ -1,12 +1,12 @@
-import * as posenet from '@tensorflow-models/posenet'
+import * as posenet from "@tensorflow-models/posenet";
 
-const pointRadius = 3
+const pointRadius = 3;
 
 export const config = {
   videoWidth: 900,
   videoHeight: 700,
   flipHorizontal: true,
-  algorithm: 'single-pose',
+  algorithm: "single-pose",
   showVideo: true,
   showSkeleton: true,
   showPoints: true,
@@ -16,13 +16,13 @@ export const config = {
   nmsRadius: 20,
   outputStride: 16,
   imageScaleFactor: 0.5,
-  skeletonColor: '#ffadea',
+  skeletonColor: "#ffadea",
   skeletonLineWidth: 6,
-  loadingText: 'Loading...please be patient...'
-}
+  loadingText: "Loading...please be patient..."
+};
 
-function toTuple({x, y}) {
-  return [x, y]
+export function toTuple({ x, y }) {
+  return [x, y];
 }
 
 export function drawKeyPoints(
@@ -34,13 +34,13 @@ export function drawKeyPoints(
 ) {
   keypoints.forEach(keypoint => {
     if (keypoint.score >= minConfidence) {
-      const {x, y} = keypoint.position
-      canvasContext.beginPath()
-      canvasContext.arc(x * scale, y * scale, pointRadius, 0, 2 * Math.PI)
-      canvasContext.fillStyle = skeletonColor
-      canvasContext.fill()
+      const { x, y } = keypoint.position;
+      canvasContext.beginPath();
+      canvasContext.arc(x * scale, y * scale, pointRadius, 0, 2 * Math.PI);
+      canvasContext.fillStyle = skeletonColor;
+      canvasContext.fill();
     }
-  })
+  });
 }
 
 function drawSegment(
@@ -51,12 +51,12 @@ function drawSegment(
   scale,
   canvasContext
 ) {
-  canvasContext.beginPath()
-  canvasContext.moveTo(firstX * scale, firstY * scale)
-  canvasContext.lineTo(nextX * scale, nextY * scale)
-  canvasContext.lineWidth = lineWidth
-  canvasContext.strokeStyle = color
-  canvasContext.stroke()
+  canvasContext.beginPath();
+  canvasContext.moveTo(firstX * scale, firstY * scale);
+  canvasContext.lineTo(nextX * scale, nextY * scale);
+  canvasContext.lineWidth = lineWidth;
+  canvasContext.strokeStyle = color;
+  canvasContext.stroke();
 }
 
 export function drawSkeleton(
@@ -70,7 +70,7 @@ export function drawSkeleton(
   const adjacentKeyPoints = posenet.getAdjacentKeyPoints(
     keypoints,
     minConfidence
-  )
+  );
 
   adjacentKeyPoints.forEach(keypoints => {
     drawSegment(
@@ -80,6 +80,6 @@ export function drawSkeleton(
       lineWidth,
       scale,
       canvasContext
-    )
-  })
+    );
+  });
 }
