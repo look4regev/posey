@@ -7,13 +7,16 @@ import "./game.css";
 
 const similarity = require("compute-cosine-similarity");
 
-const threshold = 50;
+const threshold = 0.1;
+const timeToPlay = 11;
 let keypointsVector;
 
 class PoseNet extends Component {
   static defaultProps = {
-    videoWidth: 620,
-    videoHeight: 349,
+    // videoWidth: 620,
+    // videoHeight: 349,
+    videoHeight: 620,
+    videoWidth: 349,
     flipHorizontal: true,
     algorithm: "single-pose",
     showVideo: true,
@@ -32,8 +35,9 @@ class PoseNet extends Component {
   constructor(props) {
     super(props, PoseNet.defaultProps);
     this.state = {
-      timeLeft: 11,
-      showTimer: false
+      timeLeft: timeToPlay,
+      showTimer: false,
+      similarity: 10000
     };
   }
 
@@ -86,7 +90,8 @@ class PoseNet extends Component {
   componentWillUnmount() {
     clearInterval(this.interval);
     this.setState({
-      timeLeft: 11
+      timeLeft: timeToPlay,
+      similarity: 10000
     });
   }
 
@@ -186,7 +191,8 @@ class PoseNet extends Component {
             cameraKeyPointsVector,
             keypointsVector
           );
-          if (distance > threshold) {
+          this.setState({ similarity: distance });
+          if (distance < threshold) {
             console.log("Success!!!");
             this.props.sendData(true);
           }
@@ -219,6 +225,9 @@ class PoseNet extends Component {
       <div>
         <div>
           {this.state.showTimer && <h2>{this.state.timeLeft}</h2>}
+          {this.state.showTimer && (
+            <h2>How close are you - {this.state.similarity}</h2>
+          )}
           <video id="videoNoShow" playsInline ref={this.getVideo} />
           <canvas className="webcam" ref={this.getCanvas} />
         </div>

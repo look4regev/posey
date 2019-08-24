@@ -3,11 +3,13 @@ import React, { Component } from "react";
 import "./game.css";
 import PropTypes from "prop-types";
 
+const timeToPlay = 3;
+
 class Game extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      timeLeft: 3,
+      timeLeft: timeToPlay,
       image: ""
     };
   }
@@ -32,7 +34,7 @@ class Game extends Component {
   componentWillUnmount() {
     clearInterval(this.interval);
     this.setState({
-      timeLeft: 3,
+      timeLeft: timeToPlay,
       image: ""
     });
   }
