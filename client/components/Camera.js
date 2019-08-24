@@ -130,6 +130,19 @@ class PoseNet extends Component {
     this.poseDetectionFrame(canvasContext);
   }
 
+  static printScore(similarity) {
+    if (similarity < 0.2) {
+      return "Almost there!";
+    }
+    if (similarity < 0.4) {
+      return "You're close!";
+    }
+    if (similarity < 0.6) {
+      return "Improving!";
+    }
+    return "Not very close";
+  }
+
   poseDetectionFrame(canvasContext) {
     const {
       algorithm,
@@ -226,8 +239,9 @@ class PoseNet extends Component {
         <div>
           {this.state.showTimer && <h2>{this.state.timeLeft}</h2>}
           {this.state.showTimer && (
-            <h2>How close are you - {this.state.similarity}</h2>
+            <h2>{PoseNet.printScore(this.state.similarity)}</h2>
           )}
+          {this.state.showTimer && <h2>Debug - {this.state.similarity}</h2>}
           <video id="videoNoShow" playsInline ref={this.getVideo} />
           <canvas className="webcam" ref={this.getCanvas} />
         </div>
