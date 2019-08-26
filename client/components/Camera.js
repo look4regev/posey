@@ -9,14 +9,16 @@ const similarity = require("compute-cosine-similarity");
 
 const threshold = 0.1;
 const timeToPlay = 11;
+const width = 1125;
+const height = 2436;
 let keypointsVector;
 
 class PoseNet extends Component {
   static defaultProps = {
     // videoWidth: 620,
     // videoHeight: 349,
-    videoHeight: 620,
-    videoWidth: 349,
+    videoHeight: height,
+    videoWidth: width,
     flipHorizontal: true,
     algorithm: "single-pose",
     showVideo: true,

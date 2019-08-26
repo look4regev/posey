@@ -3,8 +3,8 @@ const path = require("path");
 const fs = require("fs");
 const { Image, createCanvas } = require("canvas");
 
-const width = 620;
-const height = 349;
+const width = 1125;
+const height = 2436;
 const canvas = createCanvas(width, height);
 const ctx = canvas.getContext("2d");
 
