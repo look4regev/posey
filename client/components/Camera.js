@@ -9,8 +9,8 @@ const similarity = require("compute-cosine-similarity");
 
 const threshold = 0.1;
 const timeToPlay = 31;
-const width = 1125;
-const height = 2436;
+const width = 340;
+const height = 560;
 let keypointsVector;
 
 class PoseNet extends Component {
@@ -241,9 +241,9 @@ class PoseNet extends Component {
         <div>
           {this.state.showTimer && <h2>{this.state.timeLeft}</h2>}
           {this.state.showTimer && (
-            <h2>{PoseNet.printScore(this.state.similarity)}</h2>
+            <h3>{PoseNet.printScore(this.state.similarity)}</h3>
           )}
-          {this.state.showTimer && <h2>Debug - {this.state.similarity}</h2>}
+          {this.state.showTimer && <h4>{this.state.similarity}</h4>}
           <video id="videoNoShow" playsInline ref={this.getVideo} />
           <canvas className="webcam" ref={this.getCanvas} />
         </div>

@@ -58,7 +58,17 @@ class Posey extends Component {
       <div>
         <h1>Posey</h1>
         {!this.state.gameStarted && (
-          <button onClick={this.startGame}>Start</button>
+          <p>
+            Try to mimic the poses as best you can! You will have 10 seconds to
+            memorize the pose and 30 seconds to mimic it!
+          </p>
+        )}
+        {!this.state.gameStarted && (
+          <div className="buttonContainer">
+            <button className="myButton" onClick={this.startGame}>
+              Start
+            </button>
+          </div>
         )}
         {this.state.gameStarted &&
           !this.state.cameraOn && <Game sendData={this.switchToCamera} />}
