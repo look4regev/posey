@@ -1,5 +1,7 @@
 # Posey
 
+https://posey-game.herokuapp.com/
+
 [![Build Status](https://secure.travis-ci.org/look4regev/posey.svg)](http://travis-ci.org/look4regev/posey.svg)
 [![Heroku](https://img.shields.io/badge/heroku-deployed-blueviolet)](https://posey-game.herokuapp.com)
 
