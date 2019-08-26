@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import "./game.css";
 import PropTypes from "prop-types";
 
-const timeToPlay = 3;
+const timeToPlay = 10;
 
 class Game extends Component {
   constructor(props) {

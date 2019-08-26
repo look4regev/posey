@@ -8,7 +8,7 @@ import "./game.css";
 const similarity = require("compute-cosine-similarity");
 
 const threshold = 0.1;
-const timeToPlay = 11;
+const timeToPlay = 31;
 const width = 1125;
 const height = 2436;
 let keypointsVector;
