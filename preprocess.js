@@ -7,9 +7,12 @@ const width = 340;
 const height = 560;
 const canvas = createCanvas(width, height);
 const ctx = canvas.getContext("2d");
+const posePicsCount = 9;
 
 let imagesProcessed = 0;
 let poses = {};
+
+console.log("Loading posenet model. Please wait a minute or less..");
 
 posenet
   .load({
@@ -37,7 +40,7 @@ posenet
             .then(pose => {
               poses[file] = pose;
               imagesProcessed++;
-              if (imagesProcessed === 20) {
+              if (imagesProcessed === posePicsCount) {
                 let data = JSON.stringify(poses);
                 console.log(data);
                 fs.writeFileSync("poses.json", data);
