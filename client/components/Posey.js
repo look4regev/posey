@@ -59,8 +59,9 @@ class Posey extends Component {
         <h1>Posey</h1>
         {!this.state.gameStarted && (
           <p>
-            Try to mimic the poses as best you can! You will have 10 seconds to
-            memorize the pose and 30 seconds to mimic it!
+            Try to mimic the poses as best you can! <br />
+            You will have 10 seconds to memorize the pose and 30 seconds to
+            mimic it!
           </p>
         )}
         {!this.state.gameStarted && (
