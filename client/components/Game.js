@@ -4,6 +4,7 @@ import "./game.css";
 import PropTypes from "prop-types";
 
 const timeToPlay = 10;
+const posePicsCount = 9;
 
 class Game extends Component {
   constructor(props) {
@@ -15,7 +16,7 @@ class Game extends Component {
   }
 
   static getRandomImage() {
-    const index = Math.floor(Math.random() * 20) + 1;
+    const index = Math.floor(Math.random() * posePicsCount) + 1;
     return index + ".jpg";
   }
 
