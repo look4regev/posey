@@ -44,7 +44,15 @@ class Game extends Component {
     return (
       <div>
         {<h2>{this.state.timeLeft}</h2>}
-        {<img id="pose" src={"/poses/" + this.state.image} alt="yoga pose" />}
+        {
+          <img
+            id="pose"
+            width="360"
+            height="540"
+            src={"/poses/" + this.state.image}
+            alt="yoga pose"
+          />
+        }
       </div>
     );
   }
