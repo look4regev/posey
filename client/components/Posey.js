@@ -4,23 +4,24 @@ import "./posey.css";
 import Game from "./Game";
 import * as posenet from "@tensorflow-models/posenet";
 import Camera from "./Camera";
+import Feedback from "./Feedback";
 
 class Posey extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      gameStarted: false,
-      cameraOn: false,
-      success: false,
-      image: ""
+      success: "",
+      image: "",
+      activeScreen: "instructions"
     };
     this.startGame = this.startGame.bind(this);
     this.switchToCamera = this.switchToCamera.bind(this);
     this.switchToImage = this.switchToImage.bind(this);
+    this.switchToFeedback = this.switchToFeedback.bind(this);
   }
 
   startGame() {
-    this.setState({ gameStarted: true });
+    this.setState({ activeScreen: "image" });
   }
 
   async componentDidMount() {
@@ -46,41 +47,53 @@ class Posey extends Component {
   }
 
   switchToCamera(image) {
-    this.setState({ image: image, cameraOn: true });
+    this.setState({ image: image, activeScreen: "camera" });
   }
 
-  switchToImage(success) {
-    this.setState({ success: success, image: "", cameraOn: false });
+  switchToImage() {
+    this.setState({ activeScreen: "image" });
+  }
+
+  switchToFeedback(success) {
+    this.setState({ success: success, activeScreen: "feedback" });
   }
 
   render() {
     return (
       <div>
         <h1>Posey</h1>
-        {!this.state.gameStarted && (
+        {this.state.activeScreen === "instructions" && (
           <p>
             Try to mimic the poses as best you can! <br />
             You will have 10 seconds to memorize the pose and 30 seconds to
             mimic it!
           </p>
         )}
-        {!this.state.gameStarted && (
+        {this.state.activeScreen === "instructions" && (
           <div className="buttonContainer">
             <button className="myButton" onClick={this.startGame}>
               Start
             </button>
           </div>
         )}
-        {this.state.gameStarted &&
-          !this.state.cameraOn && <Game sendData={this.switchToCamera} />}
-        {this.state.gameStarted &&
-          this.state.cameraOn && (
-            <Camera
+        {this.state.activeScreen === "image" && (
+          <Game sendData={this.switchToCamera} />
+        )}
+        {this.state.activeScreen === "feedback" &&
+          this.state.success !== "" && (
+            <Feedback
               sendData={this.switchToImage}
-              image={this.state.image}
-              posenet={this.posenet}
+              success={this.state.success}
             />
           )}
+        {this.state.activeScreen === "camera" && (
+          <Camera
+            sendData={this.switchToFeedback}
+            isActive={this.state.activeScreen === "camera"}
+            image={this.state.image}
+            posenet={this.posenet}
+          />
+        )}
       </div>
     );
   }

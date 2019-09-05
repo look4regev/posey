@@ -2,12 +2,12 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import posesJson from "../../poses.json";
 
-import "./game.css";
+import "./camera.css";
 
 const similarity = require("compute-cosine-similarity");
 
 const threshold = 0.1;
-const timeToPlay = 31;
+const timeToPlay = 11;
 const width = 340;
 const height = 560;
 let keypointsVector;
@@ -38,6 +38,7 @@ class PoseNet extends Component {
     this.state = {
       timeLeft: timeToPlay,
       showTimer: false,
+      isActive: this.props.isActive,
       similarity: 10000
     };
   }
@@ -76,10 +77,10 @@ class PoseNet extends Component {
     keypointsVector = PoseNet.keyPointsToVector(
       posesJson[this.props.image].keypoints
     );
-    console.log(this.props.image);
     this.interval = setInterval(() => {
       this.setState({ showTimer: true });
       if (this.state.timeLeft === 1) {
+        this.setState({ isActive: false });
         this.props.sendData(false);
       } else {
         this.setState({ timeLeft: this.state.timeLeft - 1 });
@@ -202,8 +203,8 @@ class PoseNet extends Component {
             keypointsVector
           );
           this.setState({ similarity: distance });
-          if (distance < threshold) {
-            console.log("Success!!!");
+          if (distance < threshold && this.state.isActive) {
+            this.setState({ isActive: false });
             this.props.sendData(true);
           }
         }
@@ -238,6 +239,7 @@ class PoseNet extends Component {
 }
 
 PoseNet.propTypes = {
+  isActive: PropTypes.bool,
   sendData: PropTypes.func,
   image: PropTypes.string,
   posenet: PropTypes.any,
