@@ -1,4 +1,3 @@
-import { drawKeyPoints, drawSkeleton } from "./utils";
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import posesJson from "../../poses.json";
@@ -134,15 +133,15 @@ class PoseNet extends Component {
 
   static printScore(similarity) {
     if (similarity < 0.2) {
-      return "Almost there!";
+      return "4.png";
     }
     if (similarity < 0.4) {
-      return "You're close!";
+      return "3.png";
     }
     if (similarity < 0.6) {
-      return "Improving!";
+      return "2.png";
     }
-    return "Not very close";
+    return "1.png";
   }
 
   poseDetectionFrame(canvasContext) {
@@ -157,11 +156,7 @@ class PoseNet extends Component {
       nmsRadius,
       videoWidth,
       videoHeight,
-      showVideo,
-      showPoints,
-      showSkeleton,
-      skeletonColor,
-      skeletonLineWidth
+      showVideo
     } = this.props;
     const posenetModel = this.props.posenet;
     const video = this.video;
@@ -211,23 +206,6 @@ class PoseNet extends Component {
             console.log("Success!!!");
             this.props.sendData(true);
           }
-          if (showPoints) {
-            drawKeyPoints(
-              keypoints,
-              minPartConfidence,
-              skeletonColor,
-              canvasContext
-            );
-          }
-          if (showSkeleton) {
-            drawSkeleton(
-              keypoints,
-              minPartConfidence,
-              skeletonColor,
-              skeletonLineWidth,
-              canvasContext
-            );
-          }
         }
       });
       requestAnimationFrame(findPoseDetectionFrame);
@@ -238,15 +216,22 @@ class PoseNet extends Component {
   render() {
     return (
       <div>
-        <div>
-          {this.state.showTimer && <h2>{this.state.timeLeft}</h2>}
+        {this.state.showTimer && <h2>{this.state.timeLeft}</h2>}
+        <span>
           {this.state.showTimer && (
-            <h3>{PoseNet.printScore(this.state.similarity)}</h3>
+            <img
+              className="center"
+              id="score"
+              width="50"
+              height="50"
+              src={"/emojis/" + PoseNet.printScore(this.state.similarity)}
+              alt="smiley"
+            />
           )}
-          {this.state.showTimer && <h4>{this.state.similarity}</h4>}
-          <video id="videoNoShow" playsInline ref={this.getVideo} />
-          <canvas className="webcam" ref={this.getCanvas} />
-        </div>
+        </span>
+        {/*{this.state.showTimer && <h4>{this.state.similarity}</h4>}*/}
+        <video id="videoNoShow" playsInline ref={this.getVideo} />
+        <canvas className="webcam" ref={this.getCanvas} />
       </div>
     );
   }
