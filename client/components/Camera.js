@@ -7,9 +7,11 @@ import "./camera.css";
 const similarity = require("compute-cosine-similarity");
 
 const threshold = 0.1;
-const timeToPlay = 11;
+const timeToPlay = 31;
 const width = 340;
 const height = 560;
+const posePicsCount = 9;
+
 let keypointsVector;
 
 class PoseNet extends Component {
@@ -39,7 +41,8 @@ class PoseNet extends Component {
       timeLeft: timeToPlay,
       showTimer: false,
       isActive: this.props.isActive,
-      similarity: 10000
+      similarity: 10000,
+      image: ""
     };
   }
 
@@ -58,6 +61,11 @@ class PoseNet extends Component {
     return Math.sqrt(distance);
   }
 
+  static getRandomImage() {
+    const index = Math.floor(Math.random() * posePicsCount) + 1;
+    return index + ".jpg";
+  }
+
   getCanvas = elem => {
     this.canvas = elem;
   };
@@ -67,6 +75,7 @@ class PoseNet extends Component {
   };
 
   async componentDidMount() {
+    this.setState({ image: PoseNet.getRandomImage() });
     try {
       await this.setupCamera();
     } catch (error) {
@@ -75,7 +84,7 @@ class PoseNet extends Component {
       );
     }
     keypointsVector = PoseNet.keyPointsToVector(
-      posesJson[this.props.image].keypoints
+      posesJson[this.state.image].keypoints
     );
     this.interval = setInterval(() => {
       this.setState({ showTimer: true });
@@ -230,9 +239,19 @@ class PoseNet extends Component {
             />
           )}
         </span>
-        {/*{this.state.showTimer && <h4>{this.state.similarity}</h4>}*/}
-        <video id="videoNoShow" playsInline ref={this.getVideo} />
-        <canvas className="webcam" ref={this.getCanvas} />
+        <div id="images">
+          {this.state.showTimer && <h2>{this.state.similarity}</h2>}
+          <video id="videoNoShow" playsInline ref={this.getVideo} />
+          <canvas className="webcam imgcenter" ref={this.getCanvas} />
+          <img
+            className="imgcenter"
+            id="pose"
+            width="360"
+            height="540"
+            src={"/poses/" + this.state.image}
+            alt="yoga pose"
+          />
+        </div>
       </div>
     );
   }

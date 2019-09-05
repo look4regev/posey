@@ -1,3 +1,10 @@
+h2 {
+  font-family: Arial, serif;
+  font-size: 18px;
+  color: #228b22;
+  text-align: center;
+}
+
 h3 {
   font-family: Arial, serif;
   font-size: 44px;
@@ -11,4 +18,14 @@ h3 {
   margin-right: auto;
   text-align: center;
   padding: 5px;
+}
+
+.imgcenter {
+  display: inline-block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#images {
+  text-align: center;
 }
