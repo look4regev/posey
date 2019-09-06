@@ -28,8 +28,10 @@ class Feedback extends Component {
   }
 
   render() {
+    const message = this.props.success ? "Nice job!" : "Too bad!";
     return (
       <div>
+        <h2>{message}</h2>
         <img
           className="center"
           id="score"

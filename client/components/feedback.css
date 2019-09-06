@@ -1,3 +1,10 @@
+h2 {
+  font-family: Arial, serif;
+  font-size: 22px;
+  color: #228b22;
+  text-align: center;
+}
+
 .center {
   display: block;
   margin-left: auto;

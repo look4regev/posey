@@ -3,11 +3,11 @@ const path = require("path");
 const fs = require("fs");
 const { Image, createCanvas } = require("canvas");
 
-const width = 340;
-const height = 560;
+const width = 600;
+const height = 720;
 const canvas = createCanvas(width, height);
 const ctx = canvas.getContext("2d");
-const posePicsCount = 9;
+const posePicsCount = 3;
 
 let imagesProcessed = 0;
 let poses = {};

@@ -6,18 +6,17 @@ import "./camera.css";
 
 const similarity = require("compute-cosine-similarity");
 
-const threshold = 0.1;
+const threshold = 0.4;
 const timeToPlay = 31;
-const width = 340;
-const height = 560;
-const posePicsCount = 9;
+const width = 600;
+const height = 720;
+const posePicsCount = 3;
 
 let keypointsVector;
+let imagesSeen = 0;
 
 class PoseNet extends Component {
   static defaultProps = {
-    // videoWidth: 620,
-    // videoHeight: 349,
     videoHeight: height,
     videoWidth: width,
     flipHorizontal: true,
@@ -42,7 +41,8 @@ class PoseNet extends Component {
       showTimer: false,
       isActive: this.props.isActive,
       similarity: 10000,
-      image: ""
+      image: "",
+      score: this.props.score
     };
   }
 
@@ -61,8 +61,9 @@ class PoseNet extends Component {
     return Math.sqrt(distance);
   }
 
-  static getRandomImage() {
-    const index = Math.floor(Math.random() * posePicsCount) + 1;
+  static getNextImage() {
+    // const index = Math.floor(Math.random() * posePicsCount) + 1;
+    const index = imagesSeen++ % posePicsCount + 1;
     return index + ".jpg";
   }
 
@@ -75,7 +76,7 @@ class PoseNet extends Component {
   };
 
   async componentDidMount() {
-    this.setState({ image: PoseNet.getRandomImage() });
+    this.setState({ image: PoseNet.getNextImage() });
     try {
       await this.setupCamera();
     } catch (error) {
@@ -142,10 +143,10 @@ class PoseNet extends Component {
   }
 
   static printScore(similarity) {
-    if (similarity < 0.2) {
+    if (similarity < 0.45) {
       return "4.png";
     }
-    if (similarity < 0.4) {
+    if (similarity < 0.5) {
       return "3.png";
     }
     if (similarity < 0.6) {
@@ -224,13 +225,24 @@ class PoseNet extends Component {
   }
 
   render() {
+    const items = [];
+    for (let i = 0; i < this.state.score; i++) {
+      items.push(
+        <img
+          className="imgcenter"
+          width="10"
+          height="10"
+          src={"/star.png"}
+          alt="star"
+        />
+      );
+    }
     return (
       <div>
-        {this.state.showTimer && <h2>{this.state.timeLeft}</h2>}
-        <span>
+        <div className="textcenter">
           {this.state.showTimer && (
             <img
-              className="center"
+              className="imgcenter"
               id="score"
               width="50"
               height="50"
@@ -238,16 +250,18 @@ class PoseNet extends Component {
               alt="smiley"
             />
           )}
-        </span>
-        <div id="images">
+          {this.state.showTimer && <p>{this.state.timeLeft}</p>}
+          {this.state.showTimer && items}
+        </div>
+        <div className="textcenter">
           {this.state.showTimer && <h2>{this.state.similarity}</h2>}
           <video id="videoNoShow" playsInline ref={this.getVideo} />
           <canvas className="webcam imgcenter" ref={this.getCanvas} />
           <img
             className="imgcenter"
             id="pose"
-            width="360"
-            height="540"
+            width="600"
+            height="720"
             src={"/poses/" + this.state.image}
             alt="yoga pose"
           />
@@ -259,6 +273,7 @@ class PoseNet extends Component {
 
 PoseNet.propTypes = {
   isActive: PropTypes.bool,
+  score: PropTypes.number,
   sendData: PropTypes.func,
   image: PropTypes.string,
   posenet: PropTypes.any,

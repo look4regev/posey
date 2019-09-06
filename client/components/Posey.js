@@ -11,7 +11,8 @@ class Posey extends Component {
     this.state = {
       success: "",
       modelLoaded: false,
-      activeScreen: "instructions"
+      activeScreen: "instructions",
+      score: 0
     };
     this.startGame = this.startGame.bind(this);
     this.switchToCamera = this.switchToCamera.bind(this);
@@ -28,8 +29,8 @@ class Posey extends Component {
         // slow but best
         architecture: "ResNet50",
         outputStride: 32,
-        inputResolution: 161,
-        quantBytes: 1
+        inputResolution: 193,
+        quantBytes: 2
 
         // fast but worst
         // architecture: "MobileNetV1",
@@ -50,7 +51,11 @@ class Posey extends Component {
   }
 
   switchToFeedback(success) {
-    this.setState({ success: success, activeScreen: "feedback" });
+    this.setState({
+      success: success,
+      activeScreen: "feedback",
+      score: success ? this.state.score + 1 : this.state.score
+    });
   }
 
   render() {
@@ -88,6 +93,7 @@ class Posey extends Component {
             sendData={this.switchToFeedback}
             isActive={this.state.activeScreen === "camera"}
             posenet={this.posenet}
+            score={this.state.score}
           />
         )}
       </div>
