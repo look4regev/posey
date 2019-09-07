@@ -4,6 +4,7 @@ import "./posey.css";
 import * as posenet from "@tensorflow-models/posenet";
 import Camera from "./Camera";
 import Feedback from "./Feedback";
+import Summary from "./Summary";
 
 class Posey extends Component {
   constructor(props) {
@@ -17,6 +18,7 @@ class Posey extends Component {
     this.startGame = this.startGame.bind(this);
     this.switchToCamera = this.switchToCamera.bind(this);
     this.switchToFeedback = this.switchToFeedback.bind(this);
+    this.switchToInstructions = this.switchToInstructions.bind(this);
   }
 
   startGame() {
@@ -43,12 +45,22 @@ class Posey extends Component {
     this.setState({ activeScreen: "camera" });
   }
 
+  switchToInstructions() {
+    this.setState({ activeScreen: "instructions", score: 0 });
+  }
+
   switchToFeedback(success) {
-    this.setState({
-      success: success,
-      activeScreen: "feedback",
-      score: success ? this.state.score + 1 : this.state.score
-    });
+    if (success === "finish") {
+      this.setState({
+        activeScreen: "summary"
+      });
+    } else {
+      this.setState({
+        success: success === "true",
+        activeScreen: "feedback",
+        score: success === "true" ? this.state.score + 1 : this.state.score
+      });
+    }
   }
 
   render() {
@@ -86,6 +98,12 @@ class Posey extends Component {
             sendData={this.switchToFeedback}
             isActive={this.state.activeScreen === "camera"}
             posenet={this.posenet}
+            score={this.state.score}
+          />
+        )}
+        {this.state.activeScreen === "summary" && (
+          <Summary
+            sendData={this.switchToInstructions}
             score={this.state.score}
           />
         )}

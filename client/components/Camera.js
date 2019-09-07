@@ -10,12 +10,20 @@ const similarity = require("compute-cosine-similarity");
 let keypointsVector;
 let imagesSeen = 0;
 
+// const thresholds = {
+//   "1.jpg": 0.34,
+//   "2.jpg": 0.32,
+//   "3.jpg": 0.46,
+//   "4.jpg": 0.5,
+//   "5.jpg": 0.36
+// };
+
 const thresholds = {
-  "1.jpg": 0.34,
-  "2.jpg": 0.32,
-  "3.jpg": 0.46,
-  "4.jpg": 0.5,
-  "5.jpg": 0.36
+  "1.jpg": 0.1,
+  "2.jpg": 0.1,
+  "3.jpg": 0.1,
+  "4.jpg": 0.1,
+  "5.jpg": 0.1
 };
 
 class PoseNet extends Component {
@@ -64,9 +72,14 @@ class PoseNet extends Component {
     return Math.sqrt(distance);
   }
 
-  static getNextImage() {
-    const index = imagesSeen++ % consts.posePicsCount + 1;
-    return index + ".jpg";
+  getNextImage() {
+    const index = ++imagesSeen;
+    if (index > consts.posePicsCount) {
+      this.setState({ isActive: false });
+      this.props.sendData("finish");
+    } else {
+      return index + ".jpg";
+    }
   }
 
   getCanvas = elem => {
@@ -78,7 +91,7 @@ class PoseNet extends Component {
   };
 
   async componentDidMount() {
-    this.setState({ image: PoseNet.getNextImage() });
+    this.setState({ image: this.getNextImage() });
     try {
       await this.setupCamera();
     } catch (error) {
@@ -93,7 +106,7 @@ class PoseNet extends Component {
       this.setState({ showTimer: true });
       if (this.state.timeLeft === 1) {
         this.setState({ isActive: false });
-        this.props.sendData(false);
+        this.props.sendData("false");
       } else {
         this.setState({ timeLeft: this.state.timeLeft - 1 });
       }
@@ -217,7 +230,7 @@ class PoseNet extends Component {
           this.setState({ similarity: distance });
           if (distance < thresholds[this.state.image] && this.state.isActive) {
             this.setState({ isActive: false });
-            this.props.sendData(true);
+            this.props.sendData("true");
           }
         }
       });
