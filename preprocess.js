@@ -1,13 +1,12 @@
 import * as posenet from "@tensorflow-models/posenet";
+import * as consts from "./client/components/Config";
+
 const path = require("path");
 const fs = require("fs");
 const { Image, createCanvas } = require("canvas");
 
-const width = 600;
-const height = 720;
-const canvas = createCanvas(width, height);
+const canvas = createCanvas(consts.width, consts.height);
 const ctx = canvas.getContext("2d");
-const posePicsCount = 3;
 
 let imagesProcessed = 0;
 let poses = {};
@@ -32,7 +31,7 @@ posenet
         const img = new Image();
         img.onload = () => {
           console.log("image loaded");
-          ctx.drawImage(img, 0, 0, width, height);
+          ctx.drawImage(img, 0, 0, consts.width, consts.height);
           net
             .estimateSinglePose(canvas, {
               flipHorizontal: true
@@ -40,7 +39,7 @@ posenet
             .then(pose => {
               poses[file] = pose;
               imagesProcessed++;
-              if (imagesProcessed === posePicsCount) {
+              if (imagesProcessed === consts.posePicsCount) {
                 let data = JSON.stringify(poses);
                 console.log(data);
                 fs.writeFileSync("poses.json", data);

@@ -26,17 +26,10 @@ class Posey extends Component {
   async componentDidMount() {
     try {
       this.posenet = await posenet.load({
-        // slow but best
         architecture: "ResNet50",
         outputStride: 32,
         inputResolution: 193,
         quantBytes: 2
-
-        // fast but worst
-        // architecture: "MobileNetV1",
-        // outputStride: 16,
-        // inputResolution: 161,
-        // multiplier: 0.5
       });
       this.setState({ modelLoaded: true });
     } catch (error) {

@@ -1,24 +1,27 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import posesJson from "../../poses.json";
+import * as consts from "./Config";
 
 import "./camera.css";
 
 const similarity = require("compute-cosine-similarity");
 
-const threshold = 0.4;
-const timeToPlay = 31;
-const width = 600;
-const height = 720;
-const posePicsCount = 3;
-
 let keypointsVector;
 let imagesSeen = 0;
 
+const thresholds = {
+  "1.jpg": 0.34,
+  "2.jpg": 0.32,
+  "3.jpg": 0.46,
+  "4.jpg": 0.5,
+  "5.jpg": 0.36
+};
+
 class PoseNet extends Component {
   static defaultProps = {
-    videoHeight: height,
-    videoWidth: width,
+    videoHeight: consts.height,
+    videoWidth: consts.width,
     flipHorizontal: true,
     algorithm: "single-pose",
     showVideo: true,
@@ -37,7 +40,7 @@ class PoseNet extends Component {
   constructor(props) {
     super(props, PoseNet.defaultProps);
     this.state = {
-      timeLeft: timeToPlay,
+      timeLeft: consts.timeToPlay,
       showTimer: false,
       isActive: this.props.isActive,
       similarity: 10000,
@@ -62,8 +65,7 @@ class PoseNet extends Component {
   }
 
   static getNextImage() {
-    // const index = Math.floor(Math.random() * posePicsCount) + 1;
-    const index = imagesSeen++ % posePicsCount + 1;
+    const index = imagesSeen++ % consts.posePicsCount + 1;
     return index + ".jpg";
   }
 
@@ -102,7 +104,7 @@ class PoseNet extends Component {
   componentWillUnmount() {
     clearInterval(this.interval);
     this.setState({
-      timeLeft: timeToPlay,
+      timeLeft: consts.timeToPlay,
       similarity: 10000
     });
   }
@@ -143,13 +145,13 @@ class PoseNet extends Component {
   }
 
   static printScore(similarity) {
-    if (similarity < 0.45) {
+    if (similarity < 0.4) {
       return "4.png";
     }
-    if (similarity < 0.5) {
+    if (similarity < 0.45) {
       return "3.png";
     }
-    if (similarity < 0.6) {
+    if (similarity < 0.55) {
       return "2.png";
     }
     return "1.png";
@@ -213,7 +215,7 @@ class PoseNet extends Component {
             keypointsVector
           );
           this.setState({ similarity: distance });
-          if (distance < threshold && this.state.isActive) {
+          if (distance < thresholds[this.state.image] && this.state.isActive) {
             this.setState({ isActive: false });
             this.props.sendData(true);
           }
