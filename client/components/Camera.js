@@ -252,8 +252,8 @@ class PoseNet extends Component {
       items.push(
         <img
           className="imgcenter"
-          width="10"
-          height="10"
+          width="20"
+          height="20"
           src={"/star.png"}
           alt="star"
         />

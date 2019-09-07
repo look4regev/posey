@@ -28,7 +28,7 @@ class Posey extends Component {
       this.posenet = await posenet.load({
         architecture: "ResNet50",
         outputStride: 32,
-        inputResolution: 257,
+        inputResolution: 321,
         quantBytes: 2
       });
       this.setState({ modelLoaded: true });
