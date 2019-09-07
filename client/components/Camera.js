@@ -212,11 +212,6 @@ class PoseNet extends Component {
           {this.state.showTimer && items}
         </div>
         <div className="textcenter">
-          {/*{this.state.showTimer && (*/}
-          {/*  <h2>*/}
-          {/*    {this.state.similarity} {this.state.image}*/}
-          {/*  </h2>*/}
-          {/*)}*/}
           <video id="videoNoShow" playsInline ref={this.getVideo} />
           <canvas className="webcam imgcenter" ref={this.getCanvas} />
           <img
