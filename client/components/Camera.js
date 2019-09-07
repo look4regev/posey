@@ -8,42 +8,17 @@ import "./camera.css";
 const similarity = require("compute-cosine-similarity");
 
 let keypointsVector;
-
-// const thresholds = {
-//   "1.jpg": 0.34,
-//   "2.jpg": 0.32,
-//   "3.jpg": 0.46,
-//   "4.jpg": 0.5,
-//   "5.jpg": 0.36
-// };
+let frameCounter = 0;
 
 const thresholds = {
-  "1.jpg": 0.1,
-  "2.jpg": 0.1,
-  "3.jpg": 0.1,
-  "4.jpg": 0.1,
-  "5.jpg": 0.1
+  "1.jpg": 0.25,
+  "2.jpg": 0.25,
+  "3.jpg": 0.25,
+  "4.jpg": 0.35,
+  "5.jpg": 0.25
 };
 
 class PoseNet extends Component {
-  static defaultProps = {
-    videoHeight: consts.height,
-    videoWidth: consts.width,
-    flipHorizontal: true,
-    algorithm: "single-pose",
-    showVideo: true,
-    showSkeleton: false,
-    showPoints: false,
-    minPoseConfidence: 0.1,
-    minPartConfidence: 0.5,
-    maxPoseDetections: 2,
-    nmsRadius: 20,
-    outputStride: 16,
-    imageScaleFactor: 0.5,
-    skeletonColor: "#ffadea",
-    skeletonLineWidth: 6
-  };
-
   constructor(props) {
     super(props, PoseNet.defaultProps);
     this.state = {
@@ -135,16 +110,15 @@ class PoseNet extends Component {
         "Browser API navigator.mediaDevices.getUserMedia not available"
       );
     }
-    const { videoWidth, videoHeight } = this.props;
     const video = this.video;
-    video.width = videoWidth;
-    video.height = videoHeight;
+    video.width = consts.width;
+    video.height = consts.height;
     video.srcObject = await navigator.mediaDevices.getUserMedia({
       audio: false,
       video: {
         facingMode: "user",
-        width: videoWidth,
-        height: videoHeight
+        width: consts.width,
+        height: consts.height
       }
     });
     return new Promise(resolve => {
@@ -156,91 +130,53 @@ class PoseNet extends Component {
   }
 
   detectPose() {
-    const { videoWidth, videoHeight } = this.props;
     const canvas = this.canvas;
     const canvasContext = canvas.getContext("2d");
-    canvas.width = videoWidth;
-    canvas.height = videoHeight;
+    canvas.width = consts.width;
+    canvas.height = consts.height;
     this.poseDetectionFrame(canvasContext);
   }
 
   static printScore(similarity) {
-    if (similarity < 0.4) {
+    if (similarity < 0.3) {
       return "4.png";
     }
-    if (similarity < 0.45) {
+    if (similarity < 0.35) {
       return "3.png";
     }
-    if (similarity < 0.55) {
+    if (similarity < 0.45) {
       return "2.png";
     }
     return "1.png";
   }
 
   poseDetectionFrame(canvasContext) {
-    const {
-      algorithm,
-      imageScaleFactor,
-      flipHorizontal,
-      outputStride,
-      minPoseConfidence,
-      minPartConfidence,
-      maxPoseDetections,
-      nmsRadius,
-      videoWidth,
-      videoHeight,
-      showVideo
-    } = this.props;
     const posenetModel = this.props.posenet;
     const video = this.video;
     const findPoseDetectionFrame = async () => {
-      let poses = [];
-      switch (algorithm) {
-        case "multi-pose": {
-          poses = await posenetModel.estimateMultiplePoses(
-            video,
-            imageScaleFactor,
-            flipHorizontal,
-            outputStride,
-            maxPoseDetections,
-            minPartConfidence,
-            nmsRadius
-          );
-          break;
-        }
-        case "single-pose": {
-          const pose = await posenetModel.estimateSinglePose(
-            video,
-            imageScaleFactor,
-            flipHorizontal,
-            outputStride
-          );
-          poses.push(pose);
-          break;
+      frameCounter++;
+      canvasContext.clearRect(0, 0, consts.width, consts.height);
+      canvasContext.save();
+      canvasContext.scale(-1, 1);
+      canvasContext.translate(-consts.width, 0);
+      canvasContext.drawImage(video, 0, 0, consts.width, consts.height);
+      canvasContext.restore();
+      if (frameCounter % consts.frequency === 0) {
+        frameCounter = 0;
+        const pose = await posenetModel.estimateSinglePose(video, {
+          flipHorizontal: true
+        });
+        const cameraKeyPointsVector = PoseNet.keyPointsToVector(pose.keypoints);
+        const distance = PoseNet.cosineDistanceMatching(
+          cameraKeyPointsVector,
+          keypointsVector
+        );
+        this.setState({ similarity: distance });
+        if (distance < thresholds[this.state.image] && this.state.isActive) {
+          this.setState({ isActive: false });
+          this.props.sendData(true, this.state.imagesSeen);
         }
       }
-      canvasContext.clearRect(0, 0, videoWidth, videoHeight);
-      if (showVideo) {
-        canvasContext.save();
-        canvasContext.scale(-1, 1);
-        canvasContext.translate(-videoWidth, 0);
-        canvasContext.drawImage(video, 0, 0, videoWidth, videoHeight);
-        canvasContext.restore();
-      }
-      poses.forEach(({ score, keypoints }) => {
-        if (score >= minPoseConfidence) {
-          const cameraKeyPointsVector = PoseNet.keyPointsToVector(keypoints);
-          const distance = PoseNet.cosineDistanceMatching(
-            cameraKeyPointsVector,
-            keypointsVector
-          );
-          this.setState({ similarity: distance });
-          if (distance < thresholds[this.state.image] && this.state.isActive) {
-            this.setState({ isActive: false });
-            this.props.sendData(true, this.state.imagesSeen);
-          }
-        }
-      });
       requestAnimationFrame(findPoseDetectionFrame);
     };
     findPoseDetectionFrame();
@@ -252,8 +188,8 @@ class PoseNet extends Component {
       items.push(
         <img
           className="imgcenter"
-          width="20"
-          height="20"
+          width="30"
+          height="30"
           src={"/star.png"}
           alt="star"
         />
@@ -276,7 +212,11 @@ class PoseNet extends Component {
           {this.state.showTimer && items}
         </div>
         <div className="textcenter">
-          {this.state.showTimer && <h2>{this.state.similarity}</h2>}
+          {this.state.showTimer && (
+            <h2>
+              {this.state.similarity} {this.state.image}
+            </h2>
+          )}
           <video id="videoNoShow" playsInline ref={this.getVideo} />
           <canvas className="webcam imgcenter" ref={this.getCanvas} />
           <img
@@ -299,22 +239,7 @@ PoseNet.propTypes = {
   sendData: PropTypes.func,
   image: PropTypes.string,
   imagesSeen: PropTypes.arrayOf(PropTypes.number),
-  posenet: PropTypes.any,
-  algorithm: PropTypes.string,
-  imageScaleFactor: PropTypes.number,
-  flipHorizontal: PropTypes.bool,
-  outputStride: PropTypes.number,
-  minPoseConfidence: PropTypes.number,
-  minPartConfidence: PropTypes.number,
-  maxPoseDetections: PropTypes.number,
-  nmsRadius: PropTypes.number,
-  videoWidth: PropTypes.number,
-  videoHeight: PropTypes.number,
-  showVideo: PropTypes.bool,
-  showPoints: PropTypes.bool,
-  showSkeleton: PropTypes.bool,
-  skeletonColor: PropTypes.string,
-  skeletonLineWidth: PropTypes.number
+  posenet: PropTypes.any
 };
 
 export default PoseNet;
