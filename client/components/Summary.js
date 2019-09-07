@@ -5,20 +5,14 @@ import * as consts from "./Config";
 
 import "./summary.css";
 
-const timeToPlay = 5;
-
 class Summary extends Component {
   constructor(props) {
     super(props);
+    this.goBack = this.goBack.bind(this);
   }
 
-  componentDidMount() {
-    setTimeout(
-      function() {
-        this.props.sendData();
-      }.bind(this),
-      1000 * timeToPlay
-    );
+  goBack() {
+    this.props.sendData();
   }
 
   render() {
@@ -27,6 +21,11 @@ class Summary extends Component {
         <h2>
           You got {this.props.score} out of {consts.posePicsCount} correct!
         </h2>
+        <div className="buttonContainer">
+          <button className="myButton" onClick={this.goBack}>
+            Try again
+          </button>
+        </div>
       </div>
     );
   }

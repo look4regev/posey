@@ -8,7 +8,6 @@ import "./camera.css";
 const similarity = require("compute-cosine-similarity");
 
 let keypointsVector;
-let imagesSeen = 0;
 
 // const thresholds = {
 //   "1.jpg": 0.34,
@@ -53,7 +52,8 @@ class PoseNet extends Component {
       isActive: this.props.isActive,
       similarity: 10000,
       image: "",
-      score: this.props.score
+      score: this.props.score,
+      imagesSeen: this.props.imagesSeen
     };
   }
 
@@ -73,13 +73,20 @@ class PoseNet extends Component {
   }
 
   getNextImage() {
-    const index = ++imagesSeen;
-    if (index > consts.posePicsCount) {
-      this.setState({ isActive: false });
-      this.props.sendData("finish");
+    let imagesSeen = this.state.imagesSeen;
+    let index;
+    if (imagesSeen.length >= consts.posePicsCount) {
+      this.setState({ isActive: false, imagesSeen: [] });
+      index = 1;
+      this.props.sendData(null, imagesSeen);
     } else {
-      return index + ".jpg";
+      do {
+        index = Math.floor(Math.random() * consts.posePicsCount) + 1;
+      } while (imagesSeen.includes(index));
+      imagesSeen.push(index);
+      this.setState({ imagesSeen: imagesSeen });
     }
+    return index + ".jpg";
   }
 
   getCanvas = elem => {
@@ -106,7 +113,7 @@ class PoseNet extends Component {
       this.setState({ showTimer: true });
       if (this.state.timeLeft === 1) {
         this.setState({ isActive: false });
-        this.props.sendData("false");
+        this.props.sendData(false, this.state.imagesSeen);
       } else {
         this.setState({ timeLeft: this.state.timeLeft - 1 });
       }
@@ -230,7 +237,7 @@ class PoseNet extends Component {
           this.setState({ similarity: distance });
           if (distance < thresholds[this.state.image] && this.state.isActive) {
             this.setState({ isActive: false });
-            this.props.sendData("true");
+            this.props.sendData(true, this.state.imagesSeen);
           }
         }
       });
@@ -291,6 +298,7 @@ PoseNet.propTypes = {
   score: PropTypes.number,
   sendData: PropTypes.func,
   image: PropTypes.string,
+  imagesSeen: PropTypes.arrayOf(PropTypes.number),
   posenet: PropTypes.any,
   algorithm: PropTypes.string,
   imageScaleFactor: PropTypes.number,

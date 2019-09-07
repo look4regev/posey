@@ -2,6 +2,7 @@ import React, { Component } from "react";
 
 import "./posey.css";
 import * as posenet from "@tensorflow-models/posenet";
+import * as consts from "./Config";
 import Camera from "./Camera";
 import Feedback from "./Feedback";
 import Summary from "./Summary";
@@ -13,16 +14,13 @@ class Posey extends Component {
       success: "",
       modelLoaded: false,
       activeScreen: "instructions",
-      score: 0
+      score: 0,
+      imagesSeen: []
     };
     this.startGame = this.startGame.bind(this);
     this.switchToCamera = this.switchToCamera.bind(this);
     this.switchToFeedback = this.switchToFeedback.bind(this);
-    this.switchToInstructions = this.switchToInstructions.bind(this);
-  }
-
-  startGame() {
-    this.setState({ activeScreen: "camera" });
+    this.switchToCameraRestart = this.switchToCameraRestart.bind(this);
   }
 
   async componentDidMount() {
@@ -30,7 +28,7 @@ class Posey extends Component {
       this.posenet = await posenet.load({
         architecture: "ResNet50",
         outputStride: 32,
-        inputResolution: 193,
+        inputResolution: 257,
         quantBytes: 2
       });
       this.setState({ modelLoaded: true });
@@ -41,24 +39,29 @@ class Posey extends Component {
     }
   }
 
+  startGame() {
+    this.setState({ activeScreen: "camera" });
+  }
+
   switchToCamera() {
     this.setState({ activeScreen: "camera" });
   }
 
-  switchToInstructions() {
-    this.setState({ activeScreen: "instructions", score: 0 });
+  switchToCameraRestart() {
+    this.setState({ activeScreen: "camera", score: 0, imagesSeen: [] });
   }
 
-  switchToFeedback(success) {
-    if (success === "finish") {
+  switchToFeedback(success, imagesSeen) {
+    if (imagesSeen.length === consts.posePicsCount) {
       this.setState({
         activeScreen: "summary"
       });
     } else {
       this.setState({
-        success: success === "true",
+        success: success,
         activeScreen: "feedback",
-        score: success === "true" ? this.state.score + 1 : this.state.score
+        score: success ? this.state.score + 1 : this.state.score,
+        imagesSeen: imagesSeen
       });
     }
   }
@@ -98,12 +101,13 @@ class Posey extends Component {
             sendData={this.switchToFeedback}
             isActive={this.state.activeScreen === "camera"}
             posenet={this.posenet}
+            imagesSeen={this.state.imagesSeen}
             score={this.state.score}
           />
         )}
         {this.state.activeScreen === "summary" && (
           <Summary
-            sendData={this.switchToInstructions}
+            sendData={this.switchToCameraRestart}
             score={this.state.score}
           />
         )}
